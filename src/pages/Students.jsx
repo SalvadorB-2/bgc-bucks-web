@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { db } from "../services/firebase";
-import { auth } from "../services/firebase";
 import { useNavigate } from "react-router-dom";
-import { addDoc, serverTimestamp } from "firebase/firestore";
+import { subscribeToStudents, addStudent } from "../services/students";
 
 function Students() {
   const [students, setStudents] = useState([]);
@@ -15,27 +12,13 @@ function Students() {
 
   const navigate = useNavigate();
 
-  const fetchStudents = async () => {
-    const user = auth.currentUser;
-    if (!user) return;
-
-    const q = query(
-      collection(db, "students"),
-      where("school", "==", "Washington Manor Middle School")
-    );
-
-    const snapshot = await getDocs(q);
-    const studentList = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-
-    setStudents(studentList);
-    setLoading(false);
-  };
-
   useEffect(() => {
-    fetchStudents();
+    const unsubscribe = subscribeToStudents((studentsData) => {
+      setStudents(studentsData);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
   }, []);
 
   if (loading) return <p>Loading...</p>;
@@ -59,22 +42,11 @@ function Students() {
     }
 
     try {
-      await addDoc(collection(db, "students"), {
-        fullName: fullName.trim(),
-        grade: gradeNumber,
-        balance: 0,
-        school: "Washington Manor Middle School",
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
+      await addStudent(fullName.trim(), gradeNumber);
 
-      //Reset form
       setFullName("");
       setGrade("6");
       setShowForm(false);
-
-      //Refresh List
-      fetchStudents();
     } catch (error) {
       console.error("Error adding student:", error);
       alert("Failed to add student.");
@@ -83,9 +55,9 @@ function Students() {
 
   return (
     <div>
-      <h1>Student Accounts</h1>
-
       <button onClick={() => navigate("/dashboard")}>Back to Dashboard</button>
+
+      <h1>Student Accounts</h1>
 
       <div>
         <input

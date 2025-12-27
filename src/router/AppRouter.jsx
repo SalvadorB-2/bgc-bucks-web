@@ -4,6 +4,7 @@ import Signup from "../pages/Signup";
 import ProtectedRoute from "../router/ProtectedRoute";
 import Dashboard from "../pages/Dashboard";
 import Students from "../pages/Students";
+import StudentDetails from "../pages/StudentDetails";
 
 export default function AppRouter() {
   return (
@@ -27,6 +28,7 @@ export default function AppRouter() {
             </ProtectedRoute>
           }
         />
+        <Route path="/studens/:studentId" element={<StudentDetails />} />
         <Route path="*" element={<Login />} />
       </Routes>
     </BrowserRouter>
