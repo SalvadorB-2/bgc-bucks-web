@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { subscribeToStudents, deleteStudent } from "../services/students";
+import { subscribeToStudent, deleteStudent } from "../services/students";
 import {
   subscribeToTransactions,
-  addDepostit,
+  addDeposit,
   addWithdrawal,
 } from "../services/transactions";
 
@@ -42,7 +42,7 @@ function StudentDetails() {
 
   const handleDeposit = async () => {
     if (!depositAmount) return;
-    await addDepostit(studentId, Number(depositAmount));
+    await addDeposit(studentId, Number(depositAmount));
     setDepositAmount("");
     setShowDeposit(false);
   };

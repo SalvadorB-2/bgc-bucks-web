@@ -28,7 +28,14 @@ export default function AppRouter() {
             </ProtectedRoute>
           }
         />
-        <Route path="/studens/:studentId" element={<StudentDetails />} />
+        <Route
+          path="/students/:studentId"
+          element={
+            <ProtectedRoute>
+              <StudentDetails />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<Login />} />
       </Routes>
     </BrowserRouter>
