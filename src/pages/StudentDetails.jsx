@@ -57,56 +57,90 @@ function StudentDetails() {
   if (!student) return <p>Loading student...</p>;
 
   return (
-    <div>
-      <button onClick={() => navigate("/students")}>Back to Students</button>
+    <div className="student-details-page">
+      <button onClick={() => navigate("/students")}>← Back to Students</button>
 
+      {/* MAIN CARD */}
       <div className="student-card">
-        <div className="header">
-          <h2>{student.fullName}</h2>
-          <p>Grade {student.grade}</p>
-          <button className="delete-btn" onClick={handleDeleteStudent}>
+        {/* Header */}
+        <div className="student-header">
+          <div>
+            <h2>{student.fullName}</h2>
+            <p>Grade {student.grade}</p>
+          </div>
+
+          <button className="delete-student-btn" onClick={handleDeleteStudent}>
             Delete Student
           </button>
         </div>
 
-        <div className="balance-section">Balance: ${student.balance}</div>
+        {/* Balance */}
+        <div className="balance-section">
+          <h3>Balance</h3>
+          <p className="balance-amount">{student.balance} BGC Bucks</p>
+        </div>
 
-        <div className="actions">
-          <button onClick={() => setShowDeposit(!showDeposit)}>Deposit</button>
-          <button onClick={() => setShowWithdraw(!showWithdraw)}>
+        {/* Action Buttons */}
+        <div className="action-buttons">
+          <button
+            onClick={() => {
+              setShowDeposit(!showDeposit);
+              setShowWithdraw(false);
+            }}
+          >
+            Deposit
+          </button>
+
+          <button
+            onClick={() => {
+              setShowWithdraw(!showWithdraw);
+              setShowDeposit(false);
+            }}
+          >
             Withdraw
           </button>
         </div>
 
+        {/* DEPOSIT FORM */}
         {showDeposit && (
           <div className="form-extension">
             <h3>BGC Deposit Form</h3>
+
             <p>Quick Amounts</p>
-            {[1, 3, 5].map((val) => (
-              <button key={val} onClick={() => setDepositAmount(val)}>
-                ${val}
-              </button>
-            ))}
+            <div className="quick-amounts">
+              {[1, 3, 5].map((amt) => (
+                <button key={amt} onClick={() => setDepositAmount(amt)}>
+                  {amt}
+                </button>
+              ))}
+            </div>
+
             <p>Custom Amount</p>
             <input
               type="number"
               value={depositAmount}
               onChange={(e) => setDepositAmount(e.target.value)}
             />
-            <button onClick={handleDeposit}>Confirm Deposit</button>
-            <button onClick={() => setShowDeposit(false)}>Cancel</button>
+
+            <div className="form-actions">
+              <button onClick={handleDeposit}>Confirm Deposit</button>
+              <button onClick={() => setShowDeposit(false)}>Cancel</button>
+            </div>
           </div>
         )}
 
+        {/* WITHDRAW FORM */}
         {showWithdraw && (
           <div className="form-extension">
             <h3>BGC Withdraw Form</h3>
+
             <p>Amount</p>
             <input
               type="number"
               value={withdrawAmount}
               onChange={(e) => setWithdrawAmount(e.target.value)}
             />
+
             <p>Select Category</p>
             <select
               value={category}
@@ -117,13 +151,19 @@ function StudentDetails() {
               <option value="toys">Toys / Gadgets</option>
               <option value="other">Other</option>
             </select>
-            <button onClick={handleWithdraw}>Confirm Withdraw</button>
-            <button onClick={() => setShowWithdraw(false)}>Cancel</button>
+
+            <div className="form-actions">
+              <button onClick={handleWithdraw}>Confirm Withdraw</button>
+              <button onClick={() => setShowWithdraw(false)}>Cancel</button>
+            </div>
           </div>
         )}
       </div>
+
+      {/* TRANSACTIONS CARD */}
       <div className="transactions-card">
         <h3>Transaction History</h3>
+
         {transactions.length === 0 ? (
           <p>No transactions yet</p>
         ) : (
@@ -133,10 +173,20 @@ function StudentDetails() {
                 <strong>
                   {tx.type === "deposit" ? "Deposit" : "Withdraw"}
                 </strong>
-                <p>{new Date(tx.createdAt.seconds * 1000).toLocaleString()}</p>
+                <p className="timestamp">
+                  {tx.createdAt?.seconds
+                    ? new Date(tx.createdAt.seconds * 1000).toLocaleString()
+                    : ""}
+                </p>
               </div>
-              <div className={tx.type === "deposit" ? "plus" : "minus"}>
-                {tx.type === "deposit" ? "+" : "-"}${tx.amount}
+
+              <div
+                className={
+                  tx.type === "deposit" ? "amount-plus" : "amount-minus"
+                }
+              >
+                {tx.type === "deposit" ? "+" : "-"}
+                {tx.amount}
               </div>
             </div>
           ))

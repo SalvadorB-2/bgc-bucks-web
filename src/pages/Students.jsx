@@ -55,7 +55,9 @@ function Students() {
 
   return (
     <div>
-      <button onClick={() => navigate("/dashboard")}>Back to Dashboard</button>
+      <button onClick={() => navigate("/dashboard")}>
+        ← Back to Dashboard
+      </button>
 
       <h1>Student Accounts</h1>
 
