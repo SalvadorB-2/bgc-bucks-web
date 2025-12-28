@@ -1,5 +1,6 @@
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../services/firebase";
+import { doc, getDoc } from "firebase/firestore";
+import { auth, db } from "../services/firebase";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 
@@ -7,48 +8,106 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [schoolId, setSchoolId] = useState("washington_manor");
+  const [siteCode, setSiteCode] = useState("");
 
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    const trimmedSiteCode = siteCode.trim();
+
+    if (!schoolId) {
+      alert("Please select a school.");
+      return;
+    }
+
+    if (trimmedSiteCode.length !== 5) {
+      alert("Invalid site code.");
+      return;
+    }
+
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCred = await signInWithEmailAndPassword(auth, email, password);
+
+      // Verify site code for selected school
+      const schoolRef = doc(db, "schools", schoolId);
+      const schoolSnap = await getDoc(schoolRef);
+
+      if (!schoolSnap.exists()) {
+        await auth.signOut();
+        throw new Error("School does not exist.");
+      }
+
+      if (schoolSnap.data().siteCode !== trimmedSiteCode) {
+        await auth.signOut();
+        alert("Incorrect site code.");
+        return;
+      }
+
+      // All checks passed
       navigate("/dashboard");
-    } catch (err) {
-      setError("Invalid email or password.");
+    } catch (error) {
+      console.error(error);
+      alert("Login fialed. Check crednetials.");
     }
   };
 
   return (
     <div>
-      <h2>Staff Login</h2>
-
       <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Staff Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+        <h2>Staff Login</h2>
+        <div>
+          {/* School Selection */}
+          <select
+            value={schoolId}
+            onChange={(e) => setSchoolId(e.target.value)}
+            required
+          >
+            <option value="washington_manor">
+              Washington Manor Middle School
+            </option>
+          </select>
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+          {/* Site Code Input */}
+          <input
+            type="text"
+            placeholder="Site Code"
+            value={siteCode}
+            onChange={(e) => setSiteCode(e.target.value)}
+            maxLength={5}
+            required
+          />
+        </div>
+        <div>
+          {/* Email Input */}
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+
+          {/* Password Input */}
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </div>
 
         <button type="submit">Log In</button>
       </form>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      <p>
-        Don’t have an account? <Link to="/signup">Sign up</Link>
-      </p>
+      <div>
+        <p>
+          Don’t have an account? <Link to="/signup">Sign up</Link>
+        </p>
+      </div>
     </div>
   );
 }
