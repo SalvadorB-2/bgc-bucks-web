@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "../pages/Login";
-import Signup from "../pages/Signup";
 import ProtectedRoute from "../router/ProtectedRoute";
 import Dashboard from "../pages/Dashboard";
 import Students from "../pages/Students";
@@ -11,7 +10,6 @@ export default function AppRouter() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
         <Route
           path="/dashboard"
           element={
