@@ -43,7 +43,7 @@ function Dashboard() {
   if (loading) return <p>Loading...</p>;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 to-green-50">
       <div>
         <h1 className="text-blue-700">BGC Bucks Banking</h1>
         <p>Washington Manor Middle School</p>
